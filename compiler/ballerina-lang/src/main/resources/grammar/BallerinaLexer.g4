@@ -85,8 +85,10 @@ DESCENDING  : 'descending' ;
 TYPE_INT        : 'int' ;
 TYPE_BYTE       : 'byte' ;
 TYPE_FLOAT      : 'float' ;
+TYPE_DECIMAL    : 'decimal' ;
 TYPE_BOOL       : 'boolean' ;
 TYPE_STRING     : 'string' ;
+TYPE_ERROR      : 'error' ;
 TYPE_MAP        : 'map' ;
 TYPE_JSON       : 'json' ;
 TYPE_XML        : 'xml' ;
@@ -115,6 +117,8 @@ TRY         : 'try' ;
 CATCH       : 'catch' ;
 FINALLY     : 'finally' ;
 THROW       : 'throw' ;
+PANIC       : 'panic' ;
+TRAP        : 'trap' ;
 RETURN      : 'return' ;
 TRANSACTION : 'transaction' ;
 ABORT       : 'abort' ;
@@ -137,6 +141,7 @@ SCOPE       : 'scope';
 COMPENSATION: 'compensation';
 COMPENSATE  : 'compensate' ;
 PRIMARYKEY  : 'primarykey' ;
+IS          : 'is' ;
 
 // Separators
 
@@ -213,11 +218,6 @@ COMPOUND_LEFT_SHIFT      : '<<=' ;
 COMPOUND_RIGHT_SHIFT     : '>>=' ;
 COMPOUND_LOGICAL_SHIFT   : '>>>=' ;
 
-// Post Arithmetic operators.
-
-INCREMENT      : '++' ;
-DECREMENT      : '--' ;
-
 // Integer Range Operators.
 // CLOSED_RANGE - ELLIPSIS
 HALF_OPEN_RANGE   : '..<' ;
@@ -270,7 +270,7 @@ DottedHexNumber
 fragment
 DottedDecimalNumber
     :   DecimalNumeral DOT Digits
-    |   DOT Digit+
+    |   DOT Digits
     ;
 
 fragment
@@ -361,6 +361,26 @@ BooleanLiteral
     
 QuotedStringLiteral
     :   '"' StringCharacters? '"'
+    ;
+
+SymbolicStringLiteral
+    :   '\'' (UndelimeteredInitialChar UndelimeteredFollowingChar*)
+    ;
+
+fragment
+UndelimeteredInitialChar
+    : [a-zA-Z_]
+    // Negates ASCII characters
+    // Negates unicode whitespace characters : 0x200E, 0x200F, 0x2028 and 0x2029
+    // Negates unicode characters with property Pattern_Syntax=True (http://unicode.org/reports/tr31/tr31-2.html#Pattern_Syntax)
+    // Negates unicode characters of category "Private Use" ranging from: 0xE000 .. 0xF8FF | 0xF0000 .. 0xFFFFD | 0x100000 .. 0x10FFFD
+    | ~ [\u0000-\u007F\uE000-\uF8FF\u200E\u200F\u2028\u2029\u00A1-\u00A7\u00A9\u00AB-\u00AC\u00AE\u00B0-\u00B1\u00B6-\u00B7\u00BB\u00BF\u00D7\u00F7\u2010-\u2027\u2030-\u205E\u2190-\u2BFF\u3001-\u3003\u3008-\u3020\u3030\uFD3E-\uFD3F\uFE45-\uFE46\uDB80-\uDBBF\uDBC0-\uDBFF\uDC00-\uDFFF]
+    ;
+
+fragment
+UndelimeteredFollowingChar
+    : UndelimeteredInitialChar
+    | DIGIT
     ;
 
 fragment

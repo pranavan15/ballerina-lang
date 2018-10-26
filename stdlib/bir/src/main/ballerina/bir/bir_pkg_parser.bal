@@ -29,7 +29,7 @@ public type PackageParser object {
             var dcl = parseVariableDcl();
             dcls[i] = dcl;
             localVarMap[dcl.name.value] = dcl;
-            i++;
+            i += 1;
         }
         FuncBodyParser bodyParser = new(reader, localVarMap);
 
@@ -38,7 +38,7 @@ public type PackageParser object {
         i = 0;
         while (i < numBB) {
             basicBlocks[i] = bodyParser.parseBB();
-            i++;
+            i += 1;
         }
 
         return {
@@ -59,7 +59,7 @@ public type PackageParser object {
         int i;
         while (i < numFuncs) {
             funcs[i] = parseFunction();
-            i++;
+            i += 1;
         }
         return { functions:funcs };
     }
@@ -74,8 +74,8 @@ public type PackageParser object {
         } else if (b == 2){
             return "PUBLIC";
         }
-        error err = { message: "unknown variable visiblity tag " + b };
-        throw err;
+        error err = error("unknown variable visiblity tag " + b);
+        panic err;
     }
 
     public function parseVarKind() returns VarKind {
@@ -89,8 +89,8 @@ public type PackageParser object {
         } else if (b == 4){
             return "RETURN";
         }
-        error err = { message: "unknown var kind tag " + b };
-        throw err;
+        error err = error("unknown var kind tag " + b);
+        panic err;
     }
 
     public function parseSig(string sig) returns BInvokableType {

@@ -268,7 +268,7 @@ function redirect(Response response, HttpOperation httpVerb, Request request, Re
         setCountAndResolvedURL(redirectClient, response, resolvedRequestedURI);
         return response;
     } else {
-        currentCount++;
+        currentCount += 1;
         log:printDebug("Redirect count : " + currentCount);
         redirectClient.currentRedirectCount = currentCount;
         match getRedirectMethod(httpVerb, response) {
@@ -296,7 +296,7 @@ function redirect(Response response, HttpOperation httpVerb, Request request, Re
                     }
                 } else {
                     redirectClient.currentRedirectCount = 0;
-                    error err = { message: "Location header not available!" };
+                    error err = error("Location header not available!");
                     return err;
                 }
             }

@@ -26,13 +26,14 @@ public class TypeTags {
     public static final int INT_TAG = 1;
     public static final int BYTE_TAG = 2;
     public static final int FLOAT_TAG = 3;
-    public static final int STRING_TAG = 4;
-    public static final int BOOLEAN_TAG = 5;
+    public static final int DECIMAL_TAG = 4;
+    public static final int STRING_TAG = 5;
+    public static final int BOOLEAN_TAG = 6;
     public static final int ANY_TAG = 7;
     public static final int MAP_TAG = 8;
     public static final int XML_TAG = 9;
     public static final int JSON_TAG = 10;
-    public static final int MESSAGE_TAG = 11;
+    public static final int ERROR_TAG = 11;
     public static final int TABLE_TAG = 12;
     public static final int VOID_TAG = 13;
     public static final int FUNCTION_POINTER_TAG = 14;
@@ -48,8 +49,8 @@ public class TypeTags {
     public static final int FUTURE_TAG = 25;
     public static final int UNION_TAG = 26;
     public static final int TUPLE_TAG = 27;
-    public static final int FINITE_TYPE_TAG = 30;
-    public static final int OBJECT_TYPE_TAG = 31;
-    public static final int RECORD_TYPE_TAG = 32;
-    public static final int CHANNEL_TAG = 33;
+    public static final int FINITE_TYPE_TAG = 31;
+    public static final int OBJECT_TYPE_TAG = 32;
+    public static final int RECORD_TYPE_TAG = 33;
+    public static final int CHANNEL_TAG = 34;
 }

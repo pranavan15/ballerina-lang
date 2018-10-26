@@ -50,7 +50,7 @@ service<http:Service> circuitbreaker06 bind circuitBreakerEP06 {
         path: "/trialrun"
     }
     getState(endpoint caller, http:Request request) {
-        requestCount++;
+        requestCount += 1;
         // To ensure the reset timeout period expires
         if (requestCount == 3) {
             runtime:sleep(3000);
@@ -65,7 +65,7 @@ service<http:Service> circuitbreaker06 bind circuitBreakerEP06 {
             error responseError => {
                 http:Response response = new;
                 response.statusCode = http:INTERNAL_SERVER_ERROR_500;
-                response.setPayload(responseError.message);
+                response.setPayload(responseError.reason());
                 caller->respond(response) but {
                     error e => log:printError("Error sending response", err = e)
                 };
@@ -81,7 +81,7 @@ service<http:Service> helloService06 bind { port: 8092 } {
         path: "/"
     }
     sayHello(endpoint caller, http:Request req) {
-        actualCount++;
+        actualCount += 1;
         http:Response res = new;
         if (actualCount == 1 || actualCount == 2) {
             res.statusCode = http:SERVICE_UNAVAILABLE_503;

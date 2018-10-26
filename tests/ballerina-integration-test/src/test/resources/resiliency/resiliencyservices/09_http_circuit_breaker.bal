@@ -52,7 +52,7 @@ service<http:Service> circuitbreaker02 bind circuitBreakerEP02 {
     }
     invokeForceClose(endpoint caller, http:Request request) {
         http:CircuitBreakerClient cbClient = check <http:CircuitBreakerClient>unhealthyClientEP.getCallerActions();
-        forceCloseStateCount++;
+        forceCloseStateCount += 1;
         runtime:sleep(1000);
         if (forceCloseStateCount == 3) {
             runtime:sleep(5000);
@@ -68,7 +68,7 @@ service<http:Service> circuitbreaker02 bind circuitBreakerEP02 {
             error responseError => {
                 http:Response response = new;
                 response.statusCode = http:INTERNAL_SERVER_ERROR_500;
-                response.setPayload(responseError.message);
+                response.setPayload(responseError.reason());
                 caller->respond(response) but {
                     error e => log:printError("Error sending response", err = e)
                 };

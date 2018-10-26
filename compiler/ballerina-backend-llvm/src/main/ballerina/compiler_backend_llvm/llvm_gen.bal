@@ -35,15 +35,18 @@ function genFunctions(llvm:LLVMModuleRef mod, bir:Function[] funcs) {
 }
 
 function createObjectFile(string targetObjectFilePath, llvm:LLVMModuleRef mod) {
-    llvm:LLVMTargetMachineRef targetMachine;
-    try {
-        targetMachine = createTargetMachine();
-        var filenameBytes = createNullTermiatedString(targetObjectFilePath);
-        byte[] errorMsg;
-        int i = llvm:LLVMTargetMachineEmitToFile(targetMachine, mod, filenameBytes, 1, errorMsg);
-        // TODO error reporting
-    } finally {
-        llvm:LLVMDisposeTargetMachine(targetMachine);
+    var val = trap createTargetMachine();
+    // TODO : Verify this logic.
+    match val {
+        llvm:LLVMTargetMachineRef targetMachine => {
+            var filenameBytes = createNullTermiatedString(targetObjectFilePath);
+            byte[] errorMsg;
+            int i = llvm:LLVMTargetMachineEmitToFile(targetMachine, mod, filenameBytes, 1, errorMsg);
+        }
+        error => {
+            llvm:LLVMTargetMachineRef targetMachine;
+            llvm:LLVMDisposeTargetMachine(targetMachine);
+        }
     }
 }
 
@@ -121,7 +124,7 @@ function appendAllTo(any[] toArr, any[] fromArr) {
     int i = lengthof toArr;
     foreach bI in fromArr{
         toArr[i] = bI;
-        i++;
+        i += 1;
     }
 }
 

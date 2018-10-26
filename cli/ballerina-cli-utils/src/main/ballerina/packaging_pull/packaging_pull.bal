@@ -23,7 +23,7 @@ import ballerina/io;
 DefaultLogFormatter logFormatter = new DefaultLogFormatter();
 boolean isBuild;
 
-# This object denotes the default log formatter used when pulling a package directly.
+# This object denotes the default log formatter used when pulling a module directly.
 #
 # + offset - Offset from the terminal width.
 type DefaultLogFormatter object {
@@ -33,7 +33,7 @@ type DefaultLogFormatter object {
     }
 };
 
-# This object denotes the build log formatter used when pulling a package while building.
+# This object denotes the build log formatter used when pulling a module while building.
 #
 # + offset - Offset from the terminal width.
 type BuildLogFormatter object {
@@ -48,15 +48,13 @@ type BuildLogFormatter object {
 # + errMessage - The error message.
 # + return - Newly created error record.
 function createError (string errMessage) returns error {
-    error endpointError = {
-        message: logFormatter.formatLog(errMessage)
-    };
+    error endpointError = error(logFormatter.formatLog(errMessage));
     return endpointError;
 }
 
-# This function pulls a package from ballerina central.
+# This function pulls a module from ballerina central.
 #
-# + args - Arguments for pulling a package
+# + args - Arguments for pulling a module
 # + return - nil if no error occurred, else error.
 public function invokePull (string... args) returns error? {
     string url = args[0];
@@ -78,10 +76,14 @@ public function invokePull (string... args) returns error? {
     // resolve endpoint
     http:Client httpEndpoint;
     if (host != "" && port != "") {
-        try {
-            httpEndpoint = defineEndpointWithProxy(url, host, port, proxyUsername, proxyPassword);
-        } catch (error err) {
-            return createError("failed to resolve host : " + host + " with port " + port);
+        http:Client|error result = trap defineEndpointWithProxy(url, host, port, proxyUsername, proxyPassword);
+        match result {
+            http:Client ep => {
+                httpEndpoint = ep;
+            }
+            error e => {
+                return createError("failed to resolve host : " + host + " with port " + port);
+            }
         }
     } else  if (host != "" || port != "") {
         return createError("both host and port should be provided to enable proxy");
@@ -92,11 +94,11 @@ public function invokePull (string... args) returns error? {
     return pullPackage(httpEndpoint, url, pkgPath, dirPath, versionRange, fileSeparator, terminalWidth);
 }
 
-# Pulling a package
+# Pulling a module
 #
 # + httpEndpoint - The endpoint to call
 # + url - Central URL
-# + pkgPath - Package Path
+# + pkgPath - Module Path
 # + dirPath - Directory path
 # + versionRange - Balo version range
 # + fileSeparator - System file separator
@@ -117,7 +119,7 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
     match result {
         http:Response response => httpResponse = response;
         error e => {
-            return createError("connection to the remote host failed : " + e.message);
+            return createError("connection to the remote host failed : " + e.reason());
         }
     }
 
@@ -137,7 +139,7 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
                 }
             }
             error err => {
-                return createError("error occurred when pulling the package");
+                return createError("error occurred when pulling the module");
             }
         }
     } else {
@@ -148,7 +150,7 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
             contentLengthHeader = httpResponse.getHeader("content-length");
             pkgSize = check <int> contentLengthHeader;
         } else {
-            return createError("package size information is missing from remote repository. please retry.");
+            return createError("module size information is missing from remote repository. please retry.");
         }
 
         io:ReadableByteChannel sourceChannel = check (httpResponse.getByteChannel());
@@ -173,7 +175,7 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
             if (!createDirectories(destDirPath)) {
                 internal:Path pkgArchivePath = new(destArchivePath);
                 if (pkgArchivePath.exists()) {
-                    return createError("package already exists in the home repository");
+                    return createError("module already exists in the home repository");
                 }
             }
 
@@ -186,12 +188,12 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
 
             match wch.close() {
                 error destChannelCloseError => {
-                    return createError("error occured while closing the channel: " + destChannelCloseError.message);
+                    return createError("error occured while closing the channel: " + destChannelCloseError.reason());
                 }
                 () => {
                     match sourceChannel.close() {
                         error sourceChannelCloseError => {
-                            return createError("error occured while closing the channel: " + sourceChannelCloseError.message);
+                            return createError("error occured while closing the channel: " + sourceChannelCloseError.reason());
                         }
                         () => {
                             return ();
@@ -200,7 +202,7 @@ function pullPackage(http:Client httpEndpoint, string url, string pkgPath, strin
                 }
             }
         } else {
-            return createError("package version could not be detected");
+            return createError("module version could not be detected");
         }
     }
 }
@@ -278,11 +280,11 @@ function writeBytes(io:WritableByteChannel byteChannel, byte[] content, int star
 
 # This function will copy files from source to the destination path.
 #
-# + pkgSize - Size of the package pulled
+# + pkgSize - Size of the module pulled
 # + src - Byte channel of the source file
 # + dest - Byte channel of the destination folder
-# + fullPkgPath - Full package path
-# + toAndFrom - Pulled package details
+# + fullPkgPath - Full module path
+# + toAndFrom - Pulled module details
 # + width - Width of the terminal
 function copy(int pkgSize, io:ReadableByteChannel src, io:WritableByteChannel dest,
               string fullPkgPath, string toAndFrom, int width) {
@@ -300,26 +302,22 @@ function copy(int pkgSize, io:ReadableByteChannel src, io:WritableByteChannel de
     int totalVal = 10;
     int startVal = 0;
     int rightpadLength = terminalWidth - equals.length() - tabspaces.length() - rightMargin;
-    try {
-        while (!completed) {
-            (readContent, readCount) = readBytes(src, bytesChunk);
-            if (readCount <= startVal) {
-                completed = true;
-            }
-            if (dest != null) {
-                numberOfBytesWritten = writeBytes(dest, readContent, startVal);
-            }
-            totalCount = totalCount + readCount;
-            float percentage = totalCount / pkgSize;
-            noOfBytesRead = totalCount + "/" + pkgSize;
-            string bar = equals.substring(startVal, <int> (percentage * totalVal));
-            string spaces = tabspaces.substring(startVal, totalVal - <int>(percentage * totalVal));
-            string size = "[" + bar + ">" + spaces + "] " + <int>totalCount + "/" + pkgSize;
-            string msg = truncateString(fullPkgPath + toAndFrom, terminalWidth - size.length());
-            io:print("\r" + logFormatter.formatLog(rightPad(msg, rightpadLength) + size));
+    while (!completed) {
+        (readContent, readCount) = readBytes(src, bytesChunk);
+        if (readCount <= startVal) {
+            completed = true;
         }
-    } catch (error err) {
-        io:println("");
+        if (dest != null) {
+            numberOfBytesWritten = writeBytes(dest, readContent, startVal);
+        }
+        totalCount = totalCount + readCount;
+        float percentage = totalCount / pkgSize;
+        noOfBytesRead = totalCount + "/" + pkgSize;
+        string bar = equals.substring(startVal, <int> (percentage * totalVal));
+        string spaces = tabspaces.substring(startVal, totalVal - <int>(percentage * totalVal));
+        string size = "[" + bar + ">" + spaces + "] " + <int>totalCount + "/" + pkgSize;
+        string msg = truncateString(fullPkgPath + toAndFrom, terminalWidth - size.length());
+        io:print("\r" + logFormatter.formatLog(rightPad(msg, rightpadLength) + size));
     }
     io:println("\r" + logFormatter.formatLog(rightPad(fullPkgPath + toAndFrom, terminalWidth)));
 }
@@ -389,7 +387,7 @@ function closeChannel(io:ReadableByteChannel|io:WritableByteChannel byteChannel)
             match rc.close() {
                 error channelCloseError => {
                     io:println(logFormatter.formatLog("Error occured while closing the channel: " +
-                                channelCloseError.message));
+                                channelCloseError.reason()));
                 }
                 () => return;
             }
@@ -398,7 +396,7 @@ function closeChannel(io:ReadableByteChannel|io:WritableByteChannel byteChannel)
             match wc.close() {
                 error channelCloseError => {
                     io:println(logFormatter.formatLog("Error occured while closing the channel: " +
-                                channelCloseError.message));
+                                channelCloseError.reason()));
                 }
                 () => return;
             }

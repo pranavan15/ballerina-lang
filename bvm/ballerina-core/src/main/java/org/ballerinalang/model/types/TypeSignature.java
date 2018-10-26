@@ -17,8 +17,6 @@
 */
 package org.ballerinalang.model.types;
 
-import java.util.List;
-
 /**
  * @since 0.87
  */
@@ -26,6 +24,7 @@ public class TypeSignature {
     public static final String SIG_INT = "I";
     public static final String SIG_BYTE = "W";
     public static final String SIG_FLOAT = "F";
+    public static final String SIG_DECIMAL = "L";
     public static final String SIG_STRING = "S";
     public static final String SIG_BOOLEAN = "B";
     public static final String SIG_REFTYPE = "R";
@@ -47,68 +46,4 @@ public class TypeSignature {
     public static final String SIG_TUPLE = "P";
     public static final String SIG_FINITE_TYPE = "G";
     public static final String SIG_CHANNEL = "Q";
-
-    private String sigChar;
-    private TypeSignature elementTypeSig;
-    private List<TypeSignature> memberTypeSigs;
-    private String pkgPath;
-    private String name;
-
-    public TypeSignature(String sigChar) {
-        this.sigChar = sigChar;
-    }
-
-    public TypeSignature(String sigChar, TypeSignature elementTypeSig) {
-        this(sigChar);
-        this.elementTypeSig = elementTypeSig;
-    }
-
-    public TypeSignature(String sigChar, List<TypeSignature> memberTypeSigs) {
-        this(sigChar);
-        this.memberTypeSigs = memberTypeSigs;
-    }
-    
-    public TypeSignature(String sigChar, String name) {
-        this(sigChar);
-        this.name = name;
-    }
-
-    public TypeSignature(String sigChar, String packagePath, String name) {
-        this(sigChar);
-        this.pkgPath = packagePath;
-        this.name = name;
-    }
-
-    public String getSigChar() {
-        return sigChar;
-    }
-
-    public String getPkgPath() {
-        return pkgPath;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public TypeSignature getElementTypeSig() {
-        return elementTypeSig;
-    }
-
-    @Override
-    public String toString() {
-        if (elementTypeSig != null) {
-            return sigChar + elementTypeSig.toString();
-        } else if (memberTypeSigs != null) {
-            StringBuilder sig = new StringBuilder(sigChar + memberTypeSigs.size() + ";");
-            memberTypeSigs.forEach(memberSig -> sig.append(memberSig));
-            return sig.toString();
-        } else if (pkgPath != null) {
-            return sigChar + pkgPath + ":" + name + ";";
-        } else if (name != null) {
-            return sigChar + name + ";";
-        }
-
-        return sigChar;
-    }
 }

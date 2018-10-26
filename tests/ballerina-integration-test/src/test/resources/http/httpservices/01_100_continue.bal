@@ -35,8 +35,8 @@ service<http:Service> helloContinue bind { port: 9090 } {
 
             error err => {
                 res.statusCode = 500;
-                res.setPayload(untaint err.message);
-                log:printError("Failed to retrieve payload from request: " + err.message);
+                res.setPayload(untaint err.reason());
+                log:printError("Failed to retrieve payload from request: " + err.reason());
                 caller->respond(res) but {
                     error e => log:printError("Error sending response", err = e)
                 };
@@ -55,10 +55,10 @@ service<http:Service> helloContinue bind { port: 9090 } {
             mime:Entity part = bodyParts[i];
             mime:ContentDisposition contentDisposition = part.getContentDisposition();
             replyMsg += " Key:" + contentDisposition.name + " Value: " + check part.getBodyAsString();
-            i++;
+            i += 1;
         }
         caller->respond(untaint replyMsg) but {
-            error err => log:printError(err.message, err = err)
+            error err => log:printError(err.reason(), err = err)
         };
     }
 

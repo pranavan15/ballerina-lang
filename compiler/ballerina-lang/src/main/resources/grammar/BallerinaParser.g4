@@ -94,10 +94,14 @@ typeDefinition
 objectBody
     :   objectMember* objectInitializer? objectMember*
     ;
-
 objectMember
     :   objectFieldDefinition
     |   objectFunctionDefinition
+    |   typeReference
+    ;
+
+typeReference
+    :   MUL simpleTypeName SEMICOLON
     ;
 
 objectInitializer
@@ -113,7 +117,7 @@ objectFieldDefinition
     ;
 
 fieldDefinition
-    :   annotationAttachment* typeName Identifier (ASSIGN expression)? SEMICOLON
+    :   annotationAttachment* typeName Identifier QUESTION_MARK? (ASSIGN expression)? SEMICOLON
     ;
 
 recordRestFieldDefinition
@@ -240,6 +244,7 @@ valueTypeName
     |   TYPE_INT
     |   TYPE_BYTE
     |   TYPE_FLOAT
+    |   TYPE_DECIMAL
     |   TYPE_STRING
     ;
 
@@ -250,11 +255,16 @@ builtInReferenceTypeName
     |   TYPE_JSON (LT nameReference GT)?
     |   TYPE_TABLE (LT nameReference GT)?
     |   TYPE_STREAM (LT typeName GT)?
+    |   errorTypeName
     |   functionTypeName
     ;
 
 functionTypeName
     :   FUNCTION LEFT_PARENTHESIS (parameterList | parameterTypeNameList)? RIGHT_PARENTHESIS returnParameter?
+    ;
+
+errorTypeName
+    :   TYPE_ERROR (LT typeName (COMMA typeName)? GT)?
     ;
 
 xmlNamespaceName
@@ -277,7 +287,6 @@ statement
     |   assignmentStatement
     |   tupleDestructuringStatement
     |   compoundAssignmentStatement
-    |   postIncrementStatement
     |   ifElseStatement
     |   matchStatement
     |   foreachStatement
@@ -287,6 +296,7 @@ statement
     |   forkJoinStatement
     |   tryCatchStatement
     |   throwStatement
+    |   panicStatement
     |   returnStatement
     |   workerInteractionStatement
     |   expressionStmt
@@ -348,11 +358,6 @@ arrayLiteral
     :   LEFT_BRACKET expressionList? RIGHT_BRACKET
     ;
 
-typeInitExpr
-    :   NEW (LEFT_PARENTHESIS invocationArgList? RIGHT_PARENTHESIS)?
-    |   NEW userDefineTypeName LEFT_PARENTHESIS invocationArgList? RIGHT_PARENTHESIS
-    ;
-
 assignmentStatement
     :   (VAR)? variableReference ASSIGN expression SEMICOLON
     ;
@@ -377,15 +382,6 @@ compoundOperator
     |   COMPOUND_LEFT_SHIFT
     |   COMPOUND_RIGHT_SHIFT
     |   COMPOUND_LOGICAL_SHIFT
-    ;
-
-postIncrementStatement
-    :   variableReference postArithmeticOperator SEMICOLON
-    ;
-
-postArithmeticOperator
-    :   INCREMENT
-    |   DECREMENT
     ;
 
 variableReferenceList
@@ -473,25 +469,34 @@ timeoutClause
     :   TIMEOUT LEFT_PARENTHESIS expression RIGHT_PARENTHESIS LEFT_PARENTHESIS typeName Identifier RIGHT_PARENTHESIS  LEFT_BRACE statement* RIGHT_BRACE
     ;
 
+// Depricated since 0.983.0, use trap expressoin. TODO : Remove this.
 tryCatchStatement
     :   TRY LEFT_BRACE statement* RIGHT_BRACE catchClauses
     ;
 
+// TODO : Remove this.
 catchClauses
     :   catchClause+ finallyClause?
     |   finallyClause
     ;
 
+// TODO : Remove this.
 catchClause
     :   CATCH LEFT_PARENTHESIS typeName Identifier RIGHT_PARENTHESIS LEFT_BRACE statement* RIGHT_BRACE
     ;
 
+// TODO : Remove this.
 finallyClause
     :   FINALLY LEFT_BRACE statement* RIGHT_BRACE
     ;
 
+// Depricated since 0.983.0, use panic instead. TODO : Remove this.
 throwStatement
     :   THROW expression SEMICOLON
+    ;
+
+panicStatement
+    :   PANIC expression SEMICOLON
     ;
 
 returnStatement
@@ -630,11 +635,13 @@ expression
     |   lambdaFunction                                                      # lambdaFunctionExpression
     |   arrowFunction                                                       # arrowFunctionExpression
     |   typeInitExpr                                                        # typeInitExpression
+    |   errorConstructorExpr                                                # errorConstructorExpression
     |   tableQuery                                                          # tableQueryExpression
     |   LT typeName (COMMA functionInvocation)? GT expression               # typeConversionExpression
     |   (ADD | SUB | BIT_COMPLEMENT | NOT | LENGTHOF | UNTAINT) expression  # unaryExpression
     |   LEFT_PARENTHESIS expression (COMMA expression)* RIGHT_PARENTHESIS   # bracedOrTupleExpression
     |	CHECK expression										            # checkedExpression
+    |   expression IS typeName                                              # typeTestExpression
     |   expression (DIV | MUL | MOD) expression                             # binaryDivMulModExpression
     |   expression (ADD | SUB) expression                                   # binaryAddSubExpression
     |   expression (shiftExpression) expression                             # bitwiseShiftExpression
@@ -646,9 +653,23 @@ expression
     |   expression (ELLIPSIS | HALF_OPEN_RANGE) expression                  # integerRangeExpression
     |   expression QUESTION_MARK expression COLON expression                # ternaryExpression
     |   awaitExpression                                                     # awaitExprExpression
+    |   trapExpr                                                            # trapExpression
     |	expression matchExpression										    # matchExprExpression
     |   expression ELVIS expression                                         # elvisExpression
     |   typeName                                                            # typeAccessExpression
+    ;
+
+typeInitExpr
+    :   NEW (LEFT_PARENTHESIS invocationArgList? RIGHT_PARENTHESIS)?
+    |   NEW userDefineTypeName LEFT_PARENTHESIS invocationArgList? RIGHT_PARENTHESIS
+    ;
+
+errorConstructorExpr
+    :   TYPE_ERROR LEFT_PARENTHESIS expression (COMMA expression)? RIGHT_PARENTHESIS
+    ;
+
+trapExpr
+    :   TRAP expression
     ;
 
 awaitExpression
@@ -723,6 +744,7 @@ simpleLiteral
     :   (SUB)? integerLiteral
     |   (SUB)? floatingPointLiteral
     |   QuotedStringLiteral
+    |   SymbolicStringLiteral
     |   BooleanLiteral
     |   emptyTupleLiteral
     |   blobLiteral
@@ -934,7 +956,7 @@ streamingInput
     ;
 
 joinStreamingInput
-    :   (UNIDIRECTIONAL joinType | joinType UNIDIRECTIONAL | joinType) streamingInput ON expression
+    :   (UNIDIRECTIONAL joinType | joinType UNIDIRECTIONAL | joinType) streamingInput (ON expression)?
     ;
 
 outputRateLimit

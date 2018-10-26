@@ -25,13 +25,16 @@ package org.ballerinalang.util;
 public class BLangConstants {
 
     public static final int MAGIC_NUMBER = 0xBA1DA4CE;
-    public static final short VERSION_NUMBER = 22;
+    public static final short VERSION_NUMBER = 23;
 
     public static final String MAIN_FUNCTION_NAME = "main";
     public static final String INIT_FUNCTION_SUFFIX = ".<init>";
     public static final String CONSTRUCTOR_FUNCTION_SUFFIX = "new";
     public static final String START_FUNCTION_SUFFIX = ".<start>";
     public static final String STOP_FUNCTION_SUFFIX = ".<stop>";
+    public static final String TEST_INIT_FUNCTION_SUFFIX = ".<testinit>";
+    public static final String TEST_START_FUNCTION_SUFFIX = ".<teststart>";
+    public static final String TEST_STOP_FUNCTION_SUFFIX = ".<teststop>";
 
     public static final String BLANG_SRC_FILE_EXT = "bal";
     public static final String BLANG_SRC_FILE_SUFFIX = "." + BLANG_SRC_FILE_EXT;
@@ -42,13 +45,14 @@ public class BLangConstants {
     public static final String BLANG_COMPILED_PACKAGE_FILE_EXT = "balo";
     public static final String BLANG_COMPILED_PACKAGE_FILE_SUFFIX = "." + BLANG_COMPILED_PACKAGE_FILE_EXT;
 
-    // int, float, string, boolean, reference type
-    public static final int NO_OF_VAR_TYPE_CATEGORIES = 5;
+    // int, float, string, boolean, decimal, reference type
+    public static final int NO_OF_VAR_TYPE_CATEGORIES = 6;
     public static final int INT_OFFSET = 0;
     public static final int FLOAT_OFFSET = 1;
     public static final int STRING_OFFSET = 2;
     public static final int BOOL_OFFSET = 3;
-    public static final int REF_OFFSET = 4;
+    public static final int DECIMAL_OFFSET = 4;
+    public static final int REF_OFFSET = 5;
 
     public static final String USER_REPO_ENV_KEY = "BALLERINA_REPOSITORY";
     public static final String USER_REPO_DEFAULT_DIRNAME = ".ballerina";

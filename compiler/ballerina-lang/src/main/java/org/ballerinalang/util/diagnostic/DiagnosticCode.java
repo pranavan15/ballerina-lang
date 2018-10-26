@@ -24,13 +24,13 @@ package org.ballerinalang.util.diagnostic;
  */
 public enum DiagnosticCode {
 
-    UNDEFINED_PACKAGE("undefined.package"),
-    UNUSED_IMPORT_PACKAGE("unused.import.package"),
-    PACKAGE_NOT_FOUND("package.not.found"),
-    REDECLARED_IMPORT_PACKAGE("redeclared.import.package"),
-    INVALID_PACKAGE_DECLARATION("invalid.package.declaration"),
-    MISSING_PACKAGE_DECLARATION("missing.package.declaration"),
-    UNEXPECTED_PACKAGE_DECLARATION("unexpected.package.declaration"),
+    UNDEFINED_MODULE("undefined.module"),
+    UNUSED_IMPORT_MODULE("unused.import.module"),
+    MODULE_NOT_FOUND("module.not.found"),
+    REDECLARED_IMPORT_MODULE("redeclared.import.module"),
+    INVALID_MODULE_DECLARATION("invalid.module.declaration"),
+    MISSING_MODULE_DECLARATION("missing.module.declaration"),
+    UNEXPECTED_MODULE_DECLARATION("unexpected.module.declaration"),
     REDECLARED_SYMBOL("redeclared.symbol"),
     REDECLARED_BUILTIN_SYMBOL("redeclared.builtin.symbol"),
     UNDEFINED_SYMBOL("undefined.symbol"),
@@ -75,6 +75,9 @@ public enum DiagnosticCode {
     WORKER_SEND_RECEIVE_PARAMETER_COUNT_MISMATCH("worker.send.receive.parameter.count.mismatch"),
     INVALID_WORKER_INTERACTION("worker.invalid.worker.interaction"),
     INVALID_MULTIPLE_FORK_JOIN_SEND("worker.multiple.fork.join.send"),
+    INCOMPATIBLE_TYPE_REFERENCE("incompatible.type.reference"),
+    REDECLARED_TYPE_REFERENCE("redeclared.type.reference"),
+    REDECLARED_FUNCTION_FROM_TYPE_REFERENCE("redeclared.function.from.type.reference"),
 
     INVOKABLE_MUST_RETURN("invokable.must.return"),
     MAIN_SHOULD_BE_PUBLIC("main.should.be.public"),
@@ -140,6 +143,9 @@ public enum DiagnosticCode {
     REST_FIELD_NOT_ALLOWED_IN_SEALED_RECORDS("rest.field.not.allowed"),
     OPEN_RECORD_CONSTRAINT_NOT_ALLOWED("open.record.constraint.not.allowed"),
     INVALID_RECORD_REST_DESCRIPTOR("invalid.record.rest.descriptor"),
+    MISSING_REQUIRED_RECORD_FIELD("missing.required.record.field"),
+    DEFAULT_VALUES_NOT_ALLOWED_FOR_OPTIONAL_FIELDS("default.values.not.allowed.for.optional.fields"),
+    INVALID_FUNCTION_POINTER_INVOCATION("invalid.function.pointer.invocation"),
     AMBIGUOUS_TYPES("ambiguous.type"),
 
     NOT_ENOUGH_ARGS_FUNC_CALL("not.enough.args.call"),
@@ -248,8 +254,14 @@ public enum DiagnosticCode {
     MATCH_STMT_UNREACHABLE_PATTERN("match.stmt.unreachable.pattern"),
     MATCH_STMT_UNMATCHED_PATTERN("match.stmt.unmatched.pattern"),
 
-    // Safe Assignment operator related errors
-    SAFE_ASSIGN_STMT_INVALID_USAGE("safe.assign.stmt.invalid.usage"),
+    // error type related errors
+    REQUIRE_ERROR_MAPPING_VALUE("require.error.mapping.value"),
+
+    THROW_STMT_NOT_SUPPORTED("throw.stmt.not.supported"),
+    TRY_STMT_NOT_SUPPORTED("try.stmt.not.supported"),
+
+    UNKNOWN_BUILTIN_FUNCTION("unknown.builtin.method"),
+    UNSUPPORTED_BUILTIN_METHOD("unsupported.builtin.method"),
 
     // Safe navigation operator related errors
     SAFE_NAVIGATION_NOT_REQUIRED("safe.navigation.not.required"),
@@ -290,7 +302,10 @@ public enum DiagnosticCode {
     // Anonymous functions related codes
     ARROW_EXPRESSION_MISMATCHED_PARAMETER_LENGTH("arrow.expression.mismatched.parameter.length"),
     ARROW_EXPRESSION_CANNOT_INFER_TYPE_FROM_LHS("arrow.expression.cannot.infer.type.from.lhs"),
-    ARROW_EXPRESSION_NOT_SUPPORTED_ITERABLE_OPERATION("arrow.expression.not.supported.iterable.operation")
+    ARROW_EXPRESSION_NOT_SUPPORTED_ITERABLE_OPERATION("arrow.expression.not.supported.iterable.operation"),
+    
+    INCOMPATIBLE_TYPE_CHECK("incompatible.type.check"),
+    UNNECESSARY_CONDITION("unnecessary.condition"),
     ;
 
     private String value;

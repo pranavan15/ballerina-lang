@@ -3,23 +3,23 @@ import ballerina/io;
 import ballerina/mime;
 import ballerina/http;
 
-# This functions pulls a package from ballerina central.
+# This functions pulls a module from ballerina central.
 #
 # + definedEndpoint - Endpoint defined with the proxy configurations
 # + accessToken - Access token
-# + mdFileContent - Package.md file content of the package
-# + summary - Summary of the package
-# + homePageURL - Website URL of the package
-# + repositoryURL - Source code URL of the package
-# + apiDocURL - API documentation URL of the package
-# + authors - Authors of the package
-# + keywords - Keywords which describes the package
-# + license - License of the package
-# + url - URL to be invoked to push the package
-# + dirPath - Directory path where the archived package resides
-# + ballerinaVersion - Ballerina version the package is built
-# + msg - Message printed when the package is pushed successfully which includes package info
-# + baloVersion - Balo version of the package
+# + mdFileContent - Module.md file content of the module
+# + summary - Summary of the module
+# + homePageURL - Website URL of the module
+# + repositoryURL - Source code URL of the module
+# + apiDocURL - API documentation URL of the module
+# + authors - Authors of the module
+# + keywords - Keywords which describes the module
+# + license - License of the module
+# + url - URL to be invoked to push the module
+# + dirPath - Directory path where the archived module resides
+# + ballerinaVersion - Ballerina version the module is built
+# + msg - Message printed when the module is pushed successfully which includes module info
+# + baloVersion - Balo version of the module
 function pushPackage (http:Client definedEndpoint, string accessToken, string mdFileContent, string summary, string homePageURL, string repositoryURL,
                 string apiDocURL, string authors, string keywords, string license, string url, string dirPath, string ballerinaVersion, string msg, string baloVersion) {
     
@@ -53,7 +53,7 @@ function pushPackage (http:Client definedEndpoint, string accessToken, string md
     match result {
         http:Response response => httpResponse = response;
         error e => {
-            io:println("connection to the remote host failed : " + e.message);
+            io:println("connection to the remote host failed : " + e.reason());
             return;
         }
     }
@@ -69,18 +69,22 @@ function pushPackage (http:Client definedEndpoint, string accessToken, string md
     }
 }
 
-# This function will invoke the method to push the package.
+# This function will invoke the method to push the module.
 # + args - Arguments passed
 public function main (string... args) {
     http:Client httpEndpoint;
     string host = args[13];
     string port = args[14];
     if (host != "" && port != "") {
-        try {
-          httpEndpoint = defineEndpointWithProxy(args[9], host, port, args[15], args[16]);
-        } catch (error err) {
-          io:println("failed to resolve host : " + host + " with port " + port);
-          return;
+        http:Client|error result = trap defineEndpointWithProxy(args[9], host, port, args[15], args[16]);
+        match result {
+            http:Client ep => {
+                httpEndpoint = ep;
+            }
+            error e => {
+                io:println("failed to resolve host : " + host + " with port " + port);
+                return;
+            }
         }
     } else  if (host != "" || port != "") {
         io:println("both host and port should be provided to enable proxy");     

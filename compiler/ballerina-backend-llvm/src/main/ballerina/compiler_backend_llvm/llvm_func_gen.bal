@@ -38,7 +38,7 @@ type FuncGenrator object {
         int i = 0;
         while (i < func.argsCount) {
             argTypes[i] = llvm:LLVMInt64Type();
-            i++;
+            i += 1;
         }
         return argTypes;
     }
@@ -62,7 +62,7 @@ type FuncGenrator object {
             if (isParamter(localVar)){
                 var parmRef = llvm:LLVMGetParam(funcRef, paramIndex);
                 var loaded = llvm:LLVMBuildStore(builder, parmRef, localVarRef);
-                paramIndex++;
+                paramIndex += 1;
             }
         }
     }
@@ -105,8 +105,8 @@ type FuncGenrator object {
         match localVarRefs[id] {
             llvm:LLVMValueRef varRef => return varRef;
             any => {
-                error err = { message: "Local var by name '" + id + "' dosn't exist in " + func.name.value };
-                throw err;
+                error err = error("Local var by name '" + id + "' dosn't exist in " + func.name.value);
+                panic err;
             }
         }
     }

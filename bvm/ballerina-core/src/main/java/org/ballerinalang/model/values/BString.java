@@ -20,6 +20,7 @@ package org.ballerinalang.model.values;
 import org.ballerinalang.model.types.BType;
 import org.ballerinalang.model.types.BTypes;
 import org.ballerinalang.util.exceptions.BallerinaException;
+import org.wso2.ballerinalang.compiler.semantics.model.types.util.Decimal;
 
 /**
  * The {@code BString} represents a string in Ballerina.
@@ -63,6 +64,17 @@ public final class BString extends BValueType implements BRefType<String> {
             result = Double.parseDouble(this.value);
         } catch (NumberFormatException e) {
             throw new BallerinaException("input value " + this.value + " cannot be cast to float");
+        }
+        return result;
+    }
+
+    @Override
+    public Decimal decimalValue() {
+        Decimal result;
+        try {
+            result = new Decimal(this.value);
+        } catch (NumberFormatException e) {
+            throw new BallerinaException("input value " + this.value + " cannot be cast to decimal");
         }
         return result;
     }

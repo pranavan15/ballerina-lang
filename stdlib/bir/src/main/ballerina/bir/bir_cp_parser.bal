@@ -17,7 +17,7 @@ public type ConstPoolParser object {
         var cpCount = reader.readInt32();
         while (i < cpCount) {
             parseConstPoolEntry();
-            i++;
+            i += 1;
         }
         return cp;
     }
@@ -32,8 +32,8 @@ public type ConstPoolParser object {
         } else if (cpType == 5){
             parsePackageId();
         } else {
-            error err = { message: "cp type " + cpType + " not supported.:" };
-            throw err;
+            error err = error("cp type " + cpType + " not supported.:");
+            panic err;
         }
     }
 
