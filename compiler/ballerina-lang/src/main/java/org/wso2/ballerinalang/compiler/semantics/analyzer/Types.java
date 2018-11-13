@@ -1496,7 +1496,8 @@ public class Types {
                         if (((BLangLiteral) memberLiteral).value == null) {
                             return literalExpr.value == null;
                         } else {
-                            return ((BLangLiteral) memberLiteral).value.equals(literalExpr.value);
+                            return (((BLangLiteral) memberLiteral).value.equals(literalExpr.value) &&
+                                    ((BLangLiteral) memberLiteral).typeTag == literalExpr.typeTag);
                         }
                     })
                     .anyMatch(found -> found);

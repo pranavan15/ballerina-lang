@@ -636,9 +636,8 @@ public class CodeGenerator extends BLangNodeVisitor {
                 break;
 
             case TypeTags.FLOAT:
-                double doubleVal = literalExpr.value instanceof String ?
-                        Double.parseDouble((String) literalExpr.value) :
-                        (Double) literalExpr.value;
+                double doubleVal = literalExpr.value instanceof Double ? (Double) literalExpr.value :
+                        Double.parseDouble((String) literalExpr.value);
                 if (doubleVal == 0 || doubleVal == 1 || doubleVal == 2 ||
                         doubleVal == 3 || doubleVal == 4 || doubleVal == 5) {
                     opcode = InstructionCodes.FCONST_0 + (int) doubleVal;
@@ -2021,7 +2020,7 @@ public class CodeGenerator extends BLangNodeVisitor {
                 defaultValue.valueCPIndex = currentPkgInfo.addCPEntry(new ByteCPEntry(defaultValue.byteValue));
                 break;
             case TypeTags.FLOAT:
-                defaultValue.floatValue = (Double) value;
+                defaultValue.floatValue = value instanceof Double ? (Double) value : Double.parseDouble((String) value);
                 defaultValue.valueCPIndex = currentPkgInfo.addCPEntry(new FloatCPEntry(defaultValue.floatValue));
                 break;
             case TypeTags.STRING:
