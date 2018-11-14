@@ -93,6 +93,7 @@ import org.wso2.ballerinalang.compiler.tree.types.BLangStructureTypeNode;
 import org.wso2.ballerinalang.compiler.tree.types.BLangType;
 import org.wso2.ballerinalang.compiler.tree.types.BLangUserDefinedType;
 import org.wso2.ballerinalang.compiler.util.CompilerContext;
+import org.wso2.ballerinalang.compiler.util.DefaultValueLiteral;
 import org.wso2.ballerinalang.compiler.util.Name;
 import org.wso2.ballerinalang.compiler.util.Names;
 import org.wso2.ballerinalang.compiler.util.TypeTags;
@@ -619,7 +620,7 @@ public class SymbolEnter extends BLangNodeVisitor {
             return;
         }
         BLangLiteral literal = (BLangLiteral) variable.expr;
-        variable.symbol.defaultValue = literal.value;
+        variable.symbol.defaultValue = new DefaultValueLiteral(literal.value, literal.typeTag);
     }
 
     @Override
@@ -1009,7 +1010,7 @@ public class SymbolEnter extends BLangNodeVisitor {
                                         varDefNode.var.name);
                             } else {
                                 BLangLiteral literal = (BLangLiteral) varDefNode.var.expr;
-                                varSymbol.defaultValue = literal.value;
+                                varSymbol.defaultValue = new DefaultValueLiteral(literal.value, literal.typeTag);
                             }
                             return varSymbol;
                         })
