@@ -145,6 +145,16 @@ public class SnippetGenerator {
     }
 
     /**
+     * Get Listener Keyword Snippet Block.
+     *
+     * @return {@link SnippetBlock}     Generated Snippet Block
+     */
+    public static SnippetBlock getListenerKeywordSnippet() {
+        return new SnippetBlock(ItemResolverConstants.LISTENER_KEYWORD, "listener ", ItemResolverConstants.KEYWORD_TYPE,
+                                SnippetType.KEYWORD);
+    }
+
+    /**
      * Get Foreach Snippet Block.
      *
      * @return {@link SnippetBlock}     Generated Snippet Block
@@ -157,11 +167,11 @@ public class SnippetGenerator {
     }
 
     /**
-     * Get ForkJoin Snippet Block.
+     * Get Fork Snippet Block.
      *
      * @return {@link SnippetBlock}     Generated Snippet Block
      */
-    public static SnippetBlock getForkJoinStatementSnippet() {
+    public static SnippetBlock getForkStatementSnippet() {
         String snippet = "fork {" + CommonUtil.LINE_SEPARATOR + "\t${1}" + CommonUtil.LINE_SEPARATOR + "}";
         return new SnippetBlock(ItemResolverConstants.FORK, snippet, ItemResolverConstants.STATEMENT_TYPE,
                                 SnippetType.STATEMENT);
@@ -589,12 +599,12 @@ public class SnippetGenerator {
     }
 
     /**
-     * Get create Builtin Function Snippet Block.
+     * Get convert Builtin Function Snippet Block.
      *
      * @return {@link SnippetBlock}     Generated Snippet Block
      */
-    public static SnippetBlock getBuiltinCreateSnippet() {
-        return new SnippetBlock(ItemResolverConstants.BUILTIN_CREATE_LABEL, "create(${1});", "", SnippetType.SNIPPET);
+    public static SnippetBlock getBuiltinConvertSnippet() {
+        return new SnippetBlock(ItemResolverConstants.BUILTIN_CONVERT_LABEL, "convert(${1});", "", SnippetType.SNIPPET);
     }
 
     /**
@@ -622,6 +632,36 @@ public class SnippetGenerator {
      */
     public static SnippetBlock getBuiltinIsInFiniteSnippet() {
         return new SnippetBlock(ItemResolverConstants.BUILTIN_IS_INFINITE_LABEL, "isInfinite();", "",
+                SnippetType.SNIPPET);
+    }
+
+    /**
+     * Get detail Builtin Function Snippet Block.
+     *
+     * @return {@link SnippetBlock}     Generated Snippet Block
+     */
+    public static SnippetBlock getBuiltinDetailSnippet() {
+        return new SnippetBlock(ItemResolverConstants.BUILTIN_DETAIL_LABEL, "detail();", "",
+                SnippetType.SNIPPET);
+    }
+
+    /**
+     * Get reason Builtin Function Snippet Block.
+     *
+     * @return {@link SnippetBlock}     Generated Snippet Block
+     */
+    public static SnippetBlock getBuiltinReasonSnippet() {
+        return new SnippetBlock(ItemResolverConstants.BUILTIN_REASON_LABEL, "reason();", "",
+                SnippetType.SNIPPET);
+    }
+
+    /**
+     * Get Select Iterable Function Snippet Block.
+     *
+     * @return {@link SnippetBlock}     Generated Snippet Block
+     */
+    public static SnippetBlock getIterableSelectSnippet() {
+        return new SnippetBlock(ItemResolverConstants.ITR_SELECT_LABEL, "select(${1:functionReference});", "",
                 SnippetType.SNIPPET);
     }
 
